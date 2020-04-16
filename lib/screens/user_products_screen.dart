@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
+import './edit_product_screen.dart';
+
 class UserProductsScreen extends StatelessWidget {
+  static const routeName = '/UserProductsScreen';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -9,7 +13,9 @@ class UserProductsScreen extends StatelessWidget {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushNamed(EditProductsScreen.routeName);
+            },
           )
         ],
       ),
