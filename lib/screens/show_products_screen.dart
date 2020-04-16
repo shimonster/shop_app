@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import './cart_screen.dart';
 import '../widgets/icon_badge.dart';
 import '../widgets/products_grid.dart';
-import '../widgets/drawer.dart';
+import '../widgets/app_drawer.dart';
 import '../providers/cart.dart';
 
 enum FilterSelected {
@@ -23,7 +23,7 @@ class _ShowProductsScreenState extends State<ShowProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: ProductsScreenDrawer(),
+      drawer: AppDrawer(),
       appBar: AppBar(
         title: Text('Products'),
         actions: <Widget>[
