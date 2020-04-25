@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'product.dart';
 
 class Products with ChangeNotifier {
-  List<Product> _itmes = [
+  List<Product> _items = [
     Product(
       id: 'p1',
       title: 'Shoes',
@@ -41,7 +41,7 @@ class Products with ChangeNotifier {
   ];
 
   List<Product> get items {
-    return [..._itmes];
+    return [..._items];
   }
 
   List<Product> get favoriteItems {
@@ -52,18 +52,21 @@ class Products with ChangeNotifier {
     return items.firstWhere((item) => item.id == id);
   }
 
-  Future<void> addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
     const url = 'https://shop-app-484cd.firebaseio.com/products.json';
-    http
-        .post(url,
-            body: json.encode({
-              'title': product.description,
-              'descrition': product.description,
-              'imageURL': product.imageURL,
-              'price': product.price,
-              'isFavorite': product.isFavorite,
-            }))
-        .then((response) {
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(
+          {
+            'title': product.description,
+            'descrition': product.description,
+            'imageURL': product.imageURL,
+            'price': product.price,
+            'isFavorite': product.isFavorite,
+          },
+        ),
+      );
       final newProduct = Product(
         title: product.title,
         price: product.price,
@@ -71,22 +74,24 @@ class Products with ChangeNotifier {
         imageURL: product.imageURL,
         id: json.decode(response.body)['name'],
       );
-      _itmes.insert(0, newProduct);
+      _items.insert(0, newProduct);
       notifyListeners();
-    });
+    } catch (error) {
+      throw error;
+    }
   }
 
   void editProduct(String id, Product newProduct) {
-    final editIndex = _itmes.indexWhere((item) => item.id == id);
+    final editIndex = _items.indexWhere((item) => item.id == id);
     if (editIndex >= 0) {
-      _itmes[editIndex] = newProduct;
+      _items[editIndex] = newProduct;
       notifyListeners();
     }
   }
 
   void deleteProduct(String id) {
-    final deleteIndex = _itmes.indexWhere((item) => item.id == id);
-    _itmes.removeAt(deleteIndex);
+    final deleteIndex = _items.indexWhere((item) => item.id == id);
+    _items.removeAt(deleteIndex);
     notifyListeners();
   }
 }
