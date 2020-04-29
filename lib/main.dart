@@ -14,6 +14,7 @@ import './providers/orders.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  static const routeName = '/main';
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
           OrdersScreen.routeName: (ctx) => OrdersScreen(),
           EditProductsScreen.routeName: (ctx) => EditProductsScreen(),
           UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
+          routeName: (ctx) => MyApp(),
         },
       ),
     );
