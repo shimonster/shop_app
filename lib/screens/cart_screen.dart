@@ -52,11 +52,15 @@ class CartScreen extends StatelessWidget {
                         style: TextStyle(color: Theme.of(context).primaryColor),
                       ),
                       onPressed: () {
-                        orders.addOrder(
+                        orders
+                            .addOrder(
                           cartInfo.cartItems.values.toList(),
                           cartInfo.totalPrice,
-                        );
-                        cartInfo.clearCart();
+                        )
+                            .then((_) {
+                          print('after add order');
+                          cartInfo.clearCart();
+                        });
                       })
                 ],
               ),

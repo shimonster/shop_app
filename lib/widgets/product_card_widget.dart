@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +11,7 @@ class ProductCardWidget extends StatelessWidget {
     final productInfo = Provider.of<Product>(context, listen: false);
     final changeFavorite = productInfo.changeFavoriteStatus;
     final cartInfo = Provider.of<Cart>(context, listen: false);
+    final scaffold = Scaffold.of(context);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -33,7 +32,14 @@ class ProductCardWidget extends StatelessWidget {
                 product.isFavorite ? Icons.favorite : Icons.favorite_border,
                 color: Theme.of(ctx).accentColor,
               ),
-              onPressed: () => changeFavorite(),
+              onPressed: () => changeFavorite().catchError((error) {
+                scaffold.showSnackBar(
+                  SnackBar(
+                    content: Text(
+                        'Something went wrong while trying to favorite this item.'),
+                  ),
+                );
+              }),
             ),
           ),
           title: Text(
@@ -58,9 +64,12 @@ class ProductCardWidget extends StatelessWidget {
                     content: Text('You added item to cart '),
                     action: SnackBarAction(
                       label: 'UNDO',
-                      onPressed: () => cartInfo.removeSingleItem(productInfo.id),
+                      onPressed: () =>
+                          cartInfo.removeSingleItem(productInfo.id),
                     ),
-                    duration: Duration(seconds: 2,),
+                    duration: Duration(
+                      seconds: 2,
+                    ),
                   ),
                 );
               }),

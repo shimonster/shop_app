@@ -6,6 +6,13 @@ class CartItem {
   final int quantity;
   final double pricePerItem;
 
+  Map<String, dynamic> get mapVersion => {
+        'title': title,
+        'quantity': quantity,
+        'pricePerItem': pricePerItem,
+        'id': id,
+      };
+
   CartItem({
     @required this.id,
     @required this.title,
