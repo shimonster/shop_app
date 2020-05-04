@@ -23,6 +23,7 @@ class Orders with ChangeNotifier {
 
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
     const url = 'https://shop-app-484cd.firebaseio.com/orders.json';
+    final timeStamp = DateTime.now();
     final List<Map<String, dynamic>> products = cartProducts.map((value) {
       return value.mapVersion;
     }).toList();
@@ -31,7 +32,7 @@ class Orders with ChangeNotifier {
       body: json.encode({
         'price': total,
         'products': products,
-        'date': DateTime.now().toString(),
+        'date': timeStamp.toIso8601String(),
       }),
     );
   }
@@ -41,30 +42,29 @@ class Orders with ChangeNotifier {
     final List<Order> loadedOrders = [];
     final response = await http.get(url);
     final rawLoadedOrders = json.decode(response.body) as Map<String, dynamic>;
+    if (rawLoadedOrders == null) {
+      return;
+    }
     rawLoadedOrders.forEach((newId, ordValues) {
-      final List/*<Map<String, dynamic>>*/ cartItemMaps = ordValues['products'];
-      List<CartItem> cartItems = [];
-      cartItemMaps.forEach((value) {
-        cartItems.add(
-          CartItem(
-            id: value['id'],
-            title: value['title'],
-            pricePerItem: value['pricePerItem'],
-            quantity: value['quantity'],
-          ),
-        );
-      });
       loadedOrders.add(
         Order(
           newId,
           ordValues['price'],
-          cartItems,
+          (ordValues['products'] as List<dynamic>)
+              .map(
+                (value) => CartItem(
+                  id: value['id'],
+                  title: value['title'],
+                  pricePerItem: value['pricePerItem'],
+                  quantity: value['quantity'],
+                ),
+              )
+              .toList(),
           DateTime.parse(ordValues['date']),
         ),
       );
     });
-    _orders = loadedOrders;
-    print(['provider',_orders]);
+    _orders = loadedOrders.reversed.toList();
     notifyListeners();
   }
 }

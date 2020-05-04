@@ -74,7 +74,7 @@ class CartItem extends StatelessWidget {
               backgroundColor: Theme.of(context).primaryColor,
             ),
             title: Text(title),
-            subtitle: Text('Price per item: \$${(price * quantity)}'),
+            subtitle: Text('Price per item: \$${(price * quantity).toStringAsFixed(2)}'),
             trailing: Padding(
               padding: const EdgeInsets.only(right: 20),
               child: Text(

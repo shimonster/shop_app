@@ -22,18 +22,13 @@ class Product with ChangeNotifier {
     this.isFavorite = false,
   });
 
-//  void changeFavoriteStatus () {
-//    isFavorite = !isFavorite;
-//    notifyListeners();
-//  }
-
   Future<void> changeFavoriteStatus() async {
-    final url = 'https://shop-app-484cd.firebaseio.com/products/$id.json';
+    final url = 'https://shop-app-484cd.firebaseio.com/products/$id';
     var prevFavoriteStatus = isFavorite;
     isFavorite = !isFavorite;
     notifyListeners();
     final response =
-        await http.patch(url, body: json.encode({'isFavorite': !isFavorite}));
+        await http.patch(url, body: json.encode({'isFavorite': isFavorite}));
     notifyListeners();
     if (response.statusCode >= 400) {
       isFavorite = prevFavoriteStatus;

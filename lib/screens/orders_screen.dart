@@ -13,8 +13,6 @@ class OrdersScreen extends StatefulWidget {
 }
 
 class _OrdersScreenState extends State<OrdersScreen> {
-  var ordersInfo;
-  List<Order> orders;
   var _didInit = false;
   var _isLoading = false;
 
@@ -24,27 +22,27 @@ class _OrdersScreenState extends State<OrdersScreen> {
         _isLoading = true;
       });
     }
-    await Provider.of<Orders>(context).getOrders();
+    await Provider.of<Orders>(context, listen: false).getOrders();
     if (!isRefreshing) {
       setState(() {
         _isLoading = false;
       });
     }
-    _didInit = true;
   }
 
   @override
   void didChangeDependencies() {
     if (!_didInit) {
       getOrds(false);
+      _didInit = true;
     }
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    ordersInfo = Provider.of<Orders>(context);
-    orders = ordersInfo.orders;
+    final ordersInfo = Provider.of<Orders>(context);
+    final orders = ordersInfo.orders;
     print(['screen', orders]);
     return Scaffold(
       appBar: AppBar(
@@ -52,7 +50,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
       ),
       drawer: AppDrawer(),
       body: RefreshIndicator(
-        onRefresh: () => getOrds(true),
+        onRefresh: () async {
+          await getOrds(true);
+        },
         child: _isLoading
             ? Center(
                 child: CircularProgressIndicator(),
