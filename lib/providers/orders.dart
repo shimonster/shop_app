@@ -15,14 +15,17 @@ class Order {
 }
 
 class Orders with ChangeNotifier {
-  List<Order> _orders = [];
+  final String token;
+  List<Order> _orders;
+
+  Orders(this.token, this._orders);
 
   List<Order> get orders {
     return [..._orders];
   }
 
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
-    const url = 'https://shop-app-484cd.firebaseio.com/orders.json';
+    final url = 'https://shop-app-484cd.firebaseio.com/orders.json?auth=$token';
     final timeStamp = DateTime.now();
     final List<Map<String, dynamic>> products = cartProducts.map((value) {
       return value.mapVersion;
@@ -38,7 +41,7 @@ class Orders with ChangeNotifier {
   }
 
   Future<void> getOrders() async {
-    const url = 'https://shop-app-484cd.firebaseio.com/orders.json';
+    final url = 'https://shop-app-484cd.firebaseio.com/orders.json?auth=$token';
     final List<Order> loadedOrders = [];
     final response = await http.get(url);
     final rawLoadedOrders = json.decode(response.body) as Map<String, dynamic>;

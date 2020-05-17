@@ -109,8 +109,7 @@ class _ShowProductsScreenState extends State<ShowProductsScreen> {
                       RaisedButton(
                         child: Text('Restart'),
                         onPressed: () {
-                          Navigator.of(context)
-                              .pushReplacementNamed(MyApp.routeName);
+                          Navigator.of(context).pushReplacementNamed('/');
                         },
                       ),
                     ],
@@ -127,5 +126,4 @@ class _ShowProductsScreenState extends State<ShowProductsScreen> {
       },
     );
   }
-
 }
