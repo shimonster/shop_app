@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shopapp/models/http_exception.dart';
 
 import './cart.dart';
 
@@ -23,6 +25,8 @@ class Orders with ChangeNotifier {
   List<Order> get orders {
     return [..._orders];
   }
+
+  Order deletedOrder;
 
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
     final url = 'https://shop-app-484cd.firebaseio.com/orders.json?auth=$token';
@@ -69,5 +73,52 @@ class Orders with ChangeNotifier {
     });
     _orders = loadedOrders.reversed.toList();
     notifyListeners();
+  }
+
+  Future<void> cancelOrder(String ordId, BuildContext context) async {
+    var deleteOrdIdx = _orders.indexWhere((element) => element.id == ordId);
+    var deleteOrd = _orders[deleteOrdIdx];
+    try {
+      var shouldDelete = true;
+      _orders.removeAt(deleteOrdIdx);
+      notifyListeners();
+      final url =
+          'https://shop-app-484cd.firebaseio.com/orders/$ordId.json?auth=$token';
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text('You have canceled and order.'),
+          action: SnackBarAction(
+            label: 'UNDO',
+            onPressed: () {
+              _orders.insert(deleteOrdIdx, deleteOrd);
+              shouldDelete = false;
+              deleteOrdIdx = null;
+              deleteOrd = null;
+              notifyListeners();
+              return;
+            },
+          ),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      await Future.delayed(Duration(seconds: 3));
+      if (shouldDelete) {
+        final response = await http.delete(url);
+        if (response.statusCode >= 400) {
+          throw HttpException('Couldn\'t cancel order');
+        }
+      }
+    } catch (error) {
+      _orders.insert(deleteOrdIdx, deleteOrd);
+      deleteOrdIdx = null;
+      deleteOrd = null;
+      print('error');
+      throw error;
+    }
+    notifyListeners();
+  }
+
+  Future<void> redoDelete(Order order, int idx) async {
+    if (deletedOrder != null) {}
   }
 }

@@ -9,8 +9,9 @@ import '../models/http_exception.dart';
 class Products with ChangeNotifier {
   final String token;
   List<Product> _items;
+  final String userId;
 
-  Products(this.token, this._items);
+  Products(this.token, this._items, this.userId);
 
   List<Product> get items {
     return [..._items];
@@ -36,7 +37,6 @@ class Products with ChangeNotifier {
             'descrition': product.description,
             'imageURL': product.imageURL,
             'price': product.price,
-            'isFavorite': product.isFavorite,
           },
         ),
       );
@@ -64,7 +64,13 @@ class Products with ChangeNotifier {
       if (extractedData == null) {
         return;
       }
+      final favsUrl =
+          'https://shop-app-484cd.firebaseio.com/userFavorites/$userId.json?auth=$token';
+      final faves = await http.get(favsUrl);
       extractedData.forEach((id, info) {
+        final favesInfo =
+            faves == null ? json.decode(faves.body)[id] as bool : false;
+        print(faves == null ? false : favesInfo ?? false);
         loadedProducts.add(
           Product(
             id: id,
@@ -72,15 +78,14 @@ class Products with ChangeNotifier {
             description: info['description'],
             price: info['price'],
             imageURL: info['imageURL'],
-            isFavorite: info['isFavorite'],
+            isFavorite: faves == null ? false : favesInfo ?? false,
           ),
         );
       });
       _items = loadedProducts;
-      print(['products', items]);
       notifyListeners();
-      print('listeners notified then');
     } catch (error) {
+      print('get fav error');
       throw error;
     }
   }

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../screens/product_details_screen.dart';
 import '../providers/product.dart';
 import '../providers/cart.dart';
+import '../providers/auth.dart';
 
 class ProductCardWidget extends StatelessWidget {
   @override
@@ -12,6 +13,7 @@ class ProductCardWidget extends StatelessWidget {
     final changeFavorite = productInfo.changeFavoriteStatus;
     final cartInfo = Provider.of<Cart>(context, listen: false);
     final scaffold = Scaffold.of(context);
+    final authData = Provider.of<Auth>(context, listen: false);
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -32,7 +34,9 @@ class ProductCardWidget extends StatelessWidget {
                 product.isFavorite ? Icons.favorite : Icons.favorite_border,
                 color: Theme.of(ctx).accentColor,
               ),
-              onPressed: () => changeFavorite().catchError((error) {
+              onPressed: () => changeFavorite(authData.token, authData.userId)
+                  .catchError((error) {
+                scaffold.removeCurrentSnackBar();
                 scaffold.showSnackBar(
                   SnackBar(
                     content: Text(

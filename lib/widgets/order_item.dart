@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../providers/orders.dart';
 
@@ -24,23 +25,33 @@ class _OrderItemState extends State<OrderItem> {
       child: Column(
         children: <Widget>[
           Container(
-            decoration: BoxDecoration(
-                border: Border.all(
-              color: Theme.of(context).primaryColor,
-              width: 3,
-            )),
             child: ListTile(
               title: Text('\$${widget.order.price.toStringAsFixed(2)}'),
               subtitle: Text(
                 DateFormat('MM/dd/yyyy, hh:mm').format(widget.order.dateTime),
               ),
-              trailing: IconButton(
-                icon: Icon(expanded ? Icons.expand_less : Icons.expand_more),
-                onPressed: () {
-                  setState(() {
-                    expanded = !expanded;
-                  });
-                },
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  FlatButton.icon(
+                    icon: Icon(Icons.cancel),
+                    label: Text('Cancel'),
+                    textColor: Theme.of(context).errorColor,
+                    onPressed: () {
+                      Provider.of<Orders>(context)
+                          .cancelOrder(widget.order.id, context);
+                    },
+                  ),
+                  IconButton(
+                    icon:
+                        Icon(expanded ? Icons.expand_less : Icons.expand_more),
+                    onPressed: () {
+                      setState(() {
+                        expanded = !expanded;
+                      });
+                    },
+                  ),
+                ],
               ),
             ),
           ),
@@ -63,8 +74,8 @@ class _OrderItemState extends State<OrderItem> {
                         ),
                       ),
                       title: Text(widget.order.products[i].title),
-                      subtitle: Text(
-                          widget.order.products[i].pricePerItem.toStringAsFixed(2)),
+                      subtitle: Text(widget.order.products[i].pricePerItem
+                          .toStringAsFixed(2)),
                       trailing: Container(
                         padding: EdgeInsets.only(right: 20),
                         child: Text(
