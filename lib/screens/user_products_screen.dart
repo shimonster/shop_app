@@ -11,7 +11,6 @@ class UserProductsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userProducts = Provider.of<Products>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Products'),
@@ -25,30 +24,43 @@ class UserProductsScreen extends StatelessWidget {
         ],
       ),
       drawer: AppDrawer(),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await Provider.of<Products>(context).getProducts();
-        },
-        child: ListView.builder(
-          itemCount: userProducts.items.length,
-          itemBuilder: (ctx, i) {
-            return Padding(
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                children: <Widget>[
-                  UserProductItem(
-                    userProducts.items[i].imageURL,
-                    userProducts.items[i].title,
-                    userProducts.items[i].price,
-                    userProducts.items[i].id,
-                  ),
-                  const Divider(),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
+      body: FutureBuilder(
+          future:
+              Provider.of<Products>(context, listen: false).getProducts(true),
+          builder: (ctx, snapshot) {
+            print(snapshot);
+            return snapshot.connectionState == ConnectionState.waiting
+                ? const Center(
+                    child: const CircularProgressIndicator(),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () async {
+                      await Provider.of<Products>(context, listen: false)
+                          .getProducts(true);
+                    },
+                    child: Consumer<Products>(
+                      builder: (ctx, userProducts, _) => ListView.builder(
+                        itemCount: userProducts.items.length,
+                        itemBuilder: (ctx, i) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Column(
+                              children: <Widget>[
+                                UserProductItem(
+                                  userProducts.items[i].imageURL,
+                                  userProducts.items[i].title,
+                                  userProducts.items[i].price,
+                                  userProducts.items[i].id,
+                                ),
+                                const Divider(),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+          }),
     );
   }
 }

@@ -72,7 +72,7 @@ class _ShowProductsScreenState extends State<ShowProductsScreen> {
     }
 
     return FutureBuilder(
-      future: Provider.of<Products>(context, listen: false).getProducts(),
+      future: Provider.of<Products>(context, listen: false).getProducts(false),
       builder: (ctx, dataSnapshot) {
         if (dataSnapshot.connectionState == ConnectionState.waiting) {
           return buildScaffold(

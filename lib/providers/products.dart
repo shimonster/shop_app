@@ -37,6 +37,7 @@ class Products with ChangeNotifier {
             'descrition': product.description,
             'imageURL': product.imageURL,
             'price': product.price,
+            'creatorId': userId,
           },
         ),
       );
@@ -54,9 +55,11 @@ class Products with ChangeNotifier {
     }
   }
 
-  Future<void> getProducts() async {
+  Future<void> getProducts(bool filterByUser) async {
+    final filterString =
+        filterByUser ? '&orderBy="creatorId"&equalTo="$userId"' : '';
     final url =
-        'https://shop-app-484cd.firebaseio.com/products.json?auth=$token';
+        'https://shop-app-484cd.firebaseio.com/products.json?auth=$token$filterString';
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -65,12 +68,14 @@ class Products with ChangeNotifier {
         return;
       }
       final favsUrl =
-          'https://shop-app-484cd.firebaseio.com/userFavorites/$userId.json?auth=$token';
+          'https://shop-app-484cd.firebaseio.com/userFavorites/$userId.json?auth=$token$filterString';
       final faves = await http.get(favsUrl);
+      print('faves');
+      print(json.decode(faves.body));
       extractedData.forEach((id, info) {
         final favesInfo =
-            faves == null ? json.decode(faves.body)[id] as bool : false;
-        print(faves == null ? false : favesInfo ?? false);
+            faves == null ? false : json.decode(faves.body)[id] ?? false;
+        print(favesInfo);
         loadedProducts.add(
           Product(
             id: id,
@@ -78,14 +83,14 @@ class Products with ChangeNotifier {
             description: info['description'],
             price: info['price'],
             imageURL: info['imageURL'],
-            isFavorite: faves == null ? false : favesInfo ?? false,
+            isFavorite: favesInfo,
           ),
         );
       });
       _items = loadedProducts;
       notifyListeners();
     } catch (error) {
-      print('get fav error');
+      print(error);
       throw error;
     }
   }
