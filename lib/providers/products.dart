@@ -68,7 +68,7 @@ class Products with ChangeNotifier {
         return;
       }
       final favsUrl =
-          'https://shop-app-484cd.firebaseio.com/userFavorites/$userId.json?auth=$token$filterString';
+          'https://shop-app-484cd.firebaseio.com/userFavorites/$userId.json?auth=$token';
       final faves = await http.get(favsUrl);
       print('faves');
       print(json.decode(faves.body));

@@ -19,8 +19,9 @@ class Order {
 class Orders with ChangeNotifier {
   final String token;
   List<Order> _orders;
+  String userId;
 
-  Orders(this.token, this._orders);
+  Orders(this.token, this._orders, this.userId);
 
   List<Order> get orders {
     return [..._orders];
@@ -29,7 +30,8 @@ class Orders with ChangeNotifier {
   Order deletedOrder;
 
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
-    final url = 'https://shop-app-484cd.firebaseio.com/orders.json?auth=$token';
+    final url =
+        'https://shop-app-484cd.firebaseio.com/orders/$userId.json?auth=$token';
     final timeStamp = DateTime.now();
     final List<Map<String, dynamic>> products = cartProducts.map((value) {
       return value.mapVersion;
@@ -40,12 +42,14 @@ class Orders with ChangeNotifier {
         'price': total,
         'products': products,
         'date': timeStamp.toIso8601String(),
+        'creatorId': userId
       }),
     );
   }
 
   Future<void> getOrders() async {
-    final url = 'https://shop-app-484cd.firebaseio.com/orders.json?auth=$token';
+    final url =
+        'https://shop-app-484cd.firebaseio.com/orders/$userId.json?auth=$token';
     final List<Order> loadedOrders = [];
     final response = await http.get(url);
     final rawLoadedOrders = json.decode(response.body) as Map<String, dynamic>;
@@ -116,9 +120,5 @@ class Orders with ChangeNotifier {
       throw error;
     }
     notifyListeners();
-  }
-
-  Future<void> redoDelete(Order order, int idx) async {
-    if (deletedOrder != null) {}
   }
 }
