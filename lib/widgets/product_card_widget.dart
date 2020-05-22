@@ -54,32 +54,73 @@ class ProductCardWidget extends StatelessWidget {
               color: Theme.of(context).primaryColorLight,
             ),
           ),
-          trailing: IconButton(
-              icon: Icon(
-                Icons.shopping_cart,
-                color: Theme.of(context).accentColor,
-              ),
-              onPressed: () {
-                cartInfo.addItemToCart(
-                    productInfo.id, productInfo.price, productInfo.title);
-                Scaffold.of(context).hideCurrentSnackBar();
-                Scaffold.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('You added item to cart '),
-                    action: SnackBarAction(
-                      label: 'UNDO',
-                      onPressed: () =>
-                          cartInfo.removeSingleItem(productInfo.id),
-                    ),
-                    duration: Duration(
-                      seconds: 2,
-                    ),
-                  ),
-                );
-              }),
+          trailing: CartButton(cartInfo: cartInfo, productInfo: productInfo),
           backgroundColor: Colors.black.withOpacity(0.9),
         ),
       ),
     );
+  }
+}
+
+class CartButton extends StatefulWidget {
+  const CartButton({
+    Key key,
+    @required this.cartInfo,
+    @required this.productInfo,
+  }) : super(key: key);
+
+  final Cart cartInfo;
+  final Product productInfo;
+
+  @override
+  _CartButtonState createState() => _CartButtonState();
+}
+
+class _CartButtonState extends State<CartButton> {
+  var isLoadingAdd = false;
+  var isLoadingRedo = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+        icon: isLoadingAdd
+            ? CircularProgressIndicator(
+                strokeWidth: 3,
+              )
+            : Icon(
+                Icons.shopping_cart,
+                color: Theme.of(context).accentColor,
+              ),
+        onPressed: () async {
+          setState(() {
+            isLoadingAdd = true;
+          });
+          await widget.cartInfo.addItemToCart(widget.productInfo.id,
+              widget.productInfo.price, widget.productInfo.title);
+          setState(() {
+            isLoadingAdd = false;
+          });
+          Scaffold.of(context).hideCurrentSnackBar();
+          Scaffold.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('You added item to cart '),
+              action: SnackBarAction(
+                  label: isLoadingRedo ? '...' : 'UNDO',
+                  onPressed: () async {
+                    setState(() {
+                      isLoadingRedo = true;
+                    });
+                    await widget.cartInfo
+                        .removeSingleItem(widget.productInfo.id);
+                    setState(() {
+                      isLoadingRedo = false;
+                    });
+                  }),
+              duration: const Duration(
+                seconds: 2,
+              ),
+            ),
+          );
+        });
   }
 }

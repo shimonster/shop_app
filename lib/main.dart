@@ -37,12 +37,12 @@ class MyApp extends StatelessWidget {
           update: (ctx, auth, prevOrders) => Orders(auth.token,
               prevOrders != null ? prevOrders.orders : [], auth.userId),
         ),
-        ChangeNotifierProvider.value(
-          value: Cart(),
+        ChangeNotifierProxyProvider<Auth, Cart>(
+          update: (ctx, auth, prevCart) => Cart(auth.token, auth.userId,
+              prevCart == null ? {} : prevCart.cartItems),
         ),
       ],
       child: Consumer<Auth>(builder: (ctx, auth, _) {
-        print('main consumer was run');
         return MaterialApp(
           title: 'Flutter Demo',
           theme: ThemeData(

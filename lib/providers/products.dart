@@ -70,12 +70,9 @@ class Products with ChangeNotifier {
       final favsUrl =
           'https://shop-app-484cd.firebaseio.com/userFavorites/$userId.json?auth=$token';
       final faves = await http.get(favsUrl);
-      print('faves');
-      print(json.decode(faves.body));
       extractedData.forEach((id, info) {
         final favesInfo =
             faves == null ? false : json.decode(faves.body)[id] ?? false;
-        print(favesInfo);
         loadedProducts.add(
           Product(
             id: id,
