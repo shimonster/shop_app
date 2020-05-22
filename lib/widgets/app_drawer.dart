@@ -30,7 +30,10 @@ class AppDrawer extends StatelessWidget {
               FlatButton.icon(
                 icon: Icon(Icons.exit_to_app),
                 label: Text('Log Out'),
-                onPressed: Provider.of<Auth>(context, listen: false).signOut,
+                onPressed: () {
+                  Navigator.of(context).pushReplacementNamed('/');
+                  Provider.of<Auth>(context, listen: false).signOut();
+                },
                 textColor: Colors.white,
               )
             ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import './screens/auth_screen.dart';
+import './screens/loading_screen.dart';
 import './screens/show_products_screen.dart';
 import './screens/product_details_screen.dart';
 import 'screens/cart_screen.dart';
@@ -41,13 +42,22 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: Consumer<Auth>(builder: (ctx, auth, _) {
+        print('main consumer was run');
         return MaterialApp(
           title: 'Flutter Demo',
           theme: ThemeData(
               primarySwatch: Colors.deepOrange,
               accentColor: Colors.lightBlueAccent,
               fontFamily: 'Lato'),
-          home: auth.isAuth ? ShowProductsScreen() : AuthScreen(),
+          home: auth.isAuth
+              ? ShowProductsScreen()
+              : FutureBuilder(
+                  future: auth.tryAutoLogin(),
+                  builder: (ctx, snapshot) =>
+                      snapshot.connectionState == ConnectionState.waiting
+                          ? LoadingScreen()
+                          : AuthScreen(),
+                ),
           routes: {
             ProductDetailsScreen.routeName: (ctx) => ProductDetailsScreen(),
             CartScreen.routeName: (ctx) => CartScreen(),
