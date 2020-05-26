@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/http_exception.dart';
@@ -27,13 +27,11 @@ class CartItem {
 }
 
 class Cart with ChangeNotifier {
-  Map<String, CartItem> _cartItems = {};
+  Map<String, CartItem> _cartItems;
   final String userId;
   final String token;
 
-  Cart(this.token, this.userId, this._cartItems) {
-    print(cartItems);
-  }
+  Cart(this.token, this.userId, this._cartItems);
 
   Map<String, CartItem> get cartItems {
     if (_cartItems == null) {
@@ -55,9 +53,10 @@ class Cart with ChangeNotifier {
     return total;
   }
 
-  Future<void> addItemToCart(String prodId, double price, String title) async {
+  Future<void> addItemToCart(String prodId, double price, String title,
+      [String id = '']) async {
     try {
-      var urlEnd = '';
+      var urlEnd = id;
       final url =
           'https://shop-app-484cd.firebaseio.com/userCartItems/$userId/$urlEnd.json?auth=$token';
       if (_cartItems.containsKey(prodId)) {
@@ -146,7 +145,7 @@ class Cart with ChangeNotifier {
     notifyListeners();
   }
 
-  void removeItemFromCart(String prodId) async {
+  Future<void> removeItemFromCart(String prodId) async {
     final url =
         'https://shop-app-484cd.firebaseio.com/userCartItems/$userId/$prodId.json?auth=$token';
     try {
@@ -161,18 +160,45 @@ class Cart with ChangeNotifier {
     notifyListeners();
   }
 
-  void clearCart() async {
+  Future<void> clearCart() async {
     final url =
         'https://shop-app-484cd.firebaseio.com/userCartItems/$userId.json?auth=$token';
-//    try {
-    final response = await http.delete(url);
-    if (response.statusCode >= 400) {
-      throw HttpException('couldn\'t clear cart');
+    try {
+      final response = await http.delete(url);
+      if (response.statusCode >= 400) {
+        throw HttpException('couldn\'t clear cart');
+      }
+      _cartItems = {};
+    } catch (error) {
+      throw error;
     }
-    _cartItems = {};
-//    } catch (error) {
-//      throw error;
-//    }
     notifyListeners();
+  }
+
+  Future<void> getCartItems() async {
+    final url =
+        'https://shop-app-484cd.firebaseio.com/userCartItems/$userId.json?auth=$token';
+    try {
+      final response = await http.get(url);
+      final rawItems = json.decode(response.body) as Map<String, dynamic>;
+      Map<String, CartItem> loadedItems = {};
+      rawItems.forEach((key, value) {
+        loadedItems.putIfAbsent(
+          value['prodId'],
+          () => CartItem(
+            id: key,
+            title: value['title'],
+            quantity: value['quantity'],
+            pricePerItem: value['pricePerItem'],
+          ),
+        );
+      });
+      _cartItems = loadedItems;
+      notifyListeners();
+    } catch (error) {
+      print('get cart error');
+      print(error);
+      throw error;
+    }
   }
 }

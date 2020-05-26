@@ -95,8 +95,13 @@ class _CartButtonState extends State<CartButton> {
           setState(() {
             isLoadingAdd = true;
           });
-          await widget.cartInfo.addItemToCart(widget.productInfo.id,
-              widget.productInfo.price, widget.productInfo.title);
+          await widget.cartInfo.addItemToCart(
+              widget.productInfo.id,
+              widget.productInfo.price,
+              widget.productInfo.title,
+              widget.cartInfo.cartItems.containsKey(widget.productInfo.id)
+                  ? widget.cartInfo.cartItems[widget.productInfo.id].id
+                  : '');
           setState(() {
             isLoadingAdd = false;
           });

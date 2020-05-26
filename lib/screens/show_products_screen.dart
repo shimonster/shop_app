@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'cart_screen.dart';
-import '../main.dart';
 import '../widgets/icon_badge.dart';
 import '../widgets/products_grid.dart';
 import '../widgets/app_drawer.dart';
@@ -31,18 +30,26 @@ class _ShowProductsScreenState extends State<ShowProductsScreen> {
           appBar: AppBar(
             title: Text('Products'),
             actions: <Widget>[
-              Consumer<Cart>(
-                builder: (_, cart, button) => IconBadge(
-                  button,
-                  cart.itemCount.toString(),
-                  Colors.red[800],
-                ),
-                child: IconButton(
-                  icon: Icon(Icons.shopping_cart),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(CartScreen.routeName);
-                  },
-                ),
+              FutureBuilder(
+                future:
+                    Provider.of<Cart>(context, listen: false).getCartItems(),
+                builder: (ctx, snapshot) =>
+                    snapshot.connectionState == ConnectionState.waiting
+                        ? Container()
+                        : Consumer<Cart>(
+                            builder: (_, cart, button) => IconBadge(
+                              button,
+                              cart.itemCount.toString(),
+                              Colors.red[800],
+                            ),
+                            child: IconButton(
+                              icon: Icon(Icons.shopping_cart),
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pushNamed(CartScreen.routeName);
+                              },
+                            ),
+                          ),
               ),
               PopupMenuButton(
                 icon: Icon(Icons.more_vert),

@@ -10,54 +10,68 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cartInfo = Provider.of<Cart>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text('Cart'),
       ),
-      body: Column(
-        children: <Widget>[
-          Card(
-            margin: EdgeInsets.all(20),
-            child: Padding(
-              padding: EdgeInsets.all(10),
-              child: Row(
-                children: <Widget>[
-                  Text(
-                    'Total:',
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  ),
-                  Spacer(),
-                  Chip(
-                    label: Text(
-                      '\$${cartInfo.totalPrice.toStringAsFixed(2)}',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    backgroundColor: Theme.of(context).primaryColor,
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  OrderButton(),
-                ],
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemBuilder: (context, index) => CartItem(
-                cartInfo.cartItems.values.toList()[index].id,
-                cartInfo.cartItems.values.toList()[index].pricePerItem,
-                cartInfo.cartItems.values.toList()[index].quantity,
-                cartInfo.cartItems.values.toList()[index].title,
-                cartInfo.cartItems.keys.toList()[index],
-              ),
-              itemCount: cartInfo.cartItems.length,
-            ),
-          ),
-        ],
+      body: FutureBuilder(
+        future: Provider.of<Cart>(context, listen: false).getCartItems(),
+        builder: (ctx, snapshot) => Consumer<Cart>(
+          builder: (ctx, cartInfo, _) {
+            print('finished Loading');
+            print(cartInfo.cartItems);
+            return snapshot.connectionState == ConnectionState.waiting
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : Column(
+                    children: <Widget>[
+                      Card(
+                        margin: EdgeInsets.all(20),
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Row(
+                            children: <Widget>[
+                              Text(
+                                'Total:',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                ),
+                              ),
+                              Spacer(),
+                              Chip(
+                                label: Text(
+                                  '\$${cartInfo.totalPrice.toStringAsFixed(2)}',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Theme.of(context).primaryColor,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              OrderButton(),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemBuilder: (context, index) => CartItem(
+                            cartInfo.cartItems.values.toList()[index].id,
+                            cartInfo.cartItems.values
+                                .toList()[index]
+                                .pricePerItem,
+                            cartInfo.cartItems.values.toList()[index].quantity,
+                            cartInfo.cartItems.values.toList()[index].title,
+                            cartInfo.cartItems.keys.toList()[index],
+                          ),
+                          itemCount: cartInfo.cartItems.length,
+                        ),
+                      ),
+                    ],
+                  );
+          },
+        ),
       ),
     );
   }

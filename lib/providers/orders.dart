@@ -88,6 +88,7 @@ class Orders with ChangeNotifier {
       notifyListeners();
       final url =
           'https://shop-app-484cd.firebaseio.com/orders/$ordId.json?auth=$token';
+      Scaffold.of(context).hideCurrentSnackBar();
       Scaffold.of(context).showSnackBar(
         SnackBar(
           content: Text('You have canceled and order.'),
