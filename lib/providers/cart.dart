@@ -47,6 +47,9 @@ class Cart with ChangeNotifier {
   }
 
   double get totalPrice {
+    if (_cartItems == {} || _cartItems == null) {
+      return 0.0;
+    }
     var total = 0.0;
     _cartItems
         .forEach((key, value) => total += value.quantity * value.pricePerItem);
@@ -145,15 +148,15 @@ class Cart with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> removeItemFromCart(String prodId) async {
+  Future<void> removeItemFromCart(String itemId) async {
     final url =
-        'https://shop-app-484cd.firebaseio.com/userCartItems/$userId/$prodId.json?auth=$token';
+        'https://shop-app-484cd.firebaseio.com/userCartItems/$userId/$itemId.json?auth=$token';
     try {
       final response = await http.delete(url);
       if (response.statusCode >= 400) {
         throw HttpException('couldn\'t delete cart item');
       }
-      _cartItems.remove(prodId);
+      _cartItems.removeWhere((key, value) => value.id == itemId);
     } catch (error) {
       throw error;
     }

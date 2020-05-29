@@ -87,7 +87,7 @@ class Orders with ChangeNotifier {
       _orders.removeAt(deleteOrdIdx);
       notifyListeners();
       final url =
-          'https://shop-app-484cd.firebaseio.com/orders/$ordId.json?auth=$token';
+          'https://shop-app-484cd.firebaseio.com/orders/$userId/$ordId.json?auth=$token';
       Scaffold.of(context).hideCurrentSnackBar();
       Scaffold.of(context).showSnackBar(
         SnackBar(

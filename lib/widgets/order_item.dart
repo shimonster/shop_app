@@ -22,43 +22,54 @@ class _OrderItemState extends State<OrderItem> {
   Widget build(BuildContext context) {
     return Card(
       margin: EdgeInsets.all(20),
-      child: Column(
-        children: <Widget>[
-          Container(
-            child: ListTile(
-              title: Text('\$${widget.order.price.toStringAsFixed(2)}'),
-              subtitle: Text(
-                DateFormat('MM/dd/yyyy, hh:mm').format(widget.order.dateTime),
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  FlatButton.icon(
-                    icon: Icon(Icons.cancel),
-                    label: Text('Cancel'),
-                    textColor: Theme.of(context).errorColor,
-                    onPressed: () {
-                      Provider.of<Orders>(context)
-                          .cancelOrder(widget.order.id, context);
-                    },
-                  ),
-                  IconButton(
-                    icon:
-                        Icon(expanded ? Icons.expand_less : Icons.expand_more),
-                    onPressed: () {
-                      setState(() {
-                        expanded = !expanded;
-                      });
-                    },
-                  ),
-                ],
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 150),
+        curve: Curves.easeInExpo,
+        height: expanded
+            ? min(widget.order.products.length * 75.0,
+                    MediaQuery.of(context).size.height * 1 / 3) +
+                75.0
+            : 75.0,
+        child: Column(
+          children: <Widget>[
+            Container(
+              child: ListTile(
+                title: Text('\$${widget.order.price.toStringAsFixed(2)}'),
+                subtitle: Text(
+                  DateFormat('MM/dd/yyyy, hh:mm').format(widget.order.dateTime),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    FlatButton.icon(
+                      icon: Icon(Icons.cancel),
+                      label: Text('Cancel'),
+                      textColor: Theme.of(context).errorColor,
+                      onPressed: () {
+                        Provider.of<Orders>(context)
+                            .cancelOrder(widget.order.id, context);
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(
+                          expanded ? Icons.expand_less : Icons.expand_more),
+                      onPressed: () {
+                        setState(() {
+                          expanded = !expanded;
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          if (expanded)
-            Container(
-              height: min(widget.order.products.length * 75.0,
-                  MediaQuery.of(context).size.height * 1 / 3),
+            AnimatedContainer(
+              duration: Duration(milliseconds: 150),
+              curve: Curves.easeInExpo,
+              height: expanded
+                  ? min(widget.order.products.length * 75.0,
+                      MediaQuery.of(context).size.height * 1 / 3)
+                  : 0,
               child: ListView.builder(
                 itemBuilder: (ctx, i) {
                   return Container(
@@ -90,7 +101,8 @@ class _OrderItemState extends State<OrderItem> {
                 itemCount: widget.order.products.length,
               ),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -28,7 +28,7 @@ class _CartItemState extends State<CartItem> {
     return Dismissible(
       key: ValueKey(widget.id),
       confirmDismiss: (_) async {
-        var shouldDelete = false;
+        var shouldDelete;
         await showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
@@ -53,13 +53,15 @@ class _CartItemState extends State<CartItem> {
             ],
           ),
         );
-        setState(() {
-          isLoading = true;
-        });
-        await cart.removeItemFromCart(widget.productId);
-        setState(() {
-          isLoading = false;
-        });
+        if (shouldDelete) {
+          setState(() {
+            isLoading = true;
+          });
+          await cart.removeItemFromCart(widget.id);
+          setState(() {
+            isLoading = false;
+          });
+        }
         return shouldDelete;
       },
       direction: DismissDirection.endToStart,

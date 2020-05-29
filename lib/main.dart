@@ -5,7 +5,7 @@ import './screens/auth_screen.dart';
 import './screens/loading_screen.dart';
 import './screens/show_products_screen.dart';
 import './screens/product_details_screen.dart';
-import 'screens/cart_screen.dart';
+import './screens/cart_screen.dart';
 import './screens/orders_screen.dart';
 import './screens/edit_product_screen.dart';
 import './screens/user_products_screen.dart';
@@ -13,6 +13,8 @@ import './providers/products.dart';
 import './providers/cart.dart';
 import './providers/orders.dart';
 import './providers/auth.dart';
+import './helpers/costom_route.dart';
+import './helpers/custom_route_to_home.dart';
 
 void main() => runApp(MyApp());
 
@@ -46,9 +48,16 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           title: 'Flutter Demo',
           theme: ThemeData(
-              primarySwatch: Colors.deepOrange,
-              accentColor: Colors.lightBlueAccent,
-              fontFamily: 'Lato'),
+            primarySwatch: Colors.deepOrange,
+            accentColor: Colors.lightBlueAccent,
+            fontFamily: 'Lato',
+            pageTransitionsTheme: PageTransitionsTheme(
+              builders: {
+                TargetPlatform.android: CustomRouteToHomeTransitionBuilder(),
+                TargetPlatform.iOS: CustomPageTransitionBuilder(),
+              },
+            ),
+          ),
           home: auth.isAuth
               ? ShowProductsScreen()
               : FutureBuilder(
@@ -64,7 +73,7 @@ class MyApp extends StatelessWidget {
             OrdersScreen.routeName: (ctx) => OrdersScreen(),
             EditProductsScreen.routeName: (ctx) => EditProductsScreen(),
             UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
-            routeName: (ctx) => MyApp(),
+            MyApp.routeName: (ctx) => MyApp(),
           },
         );
       }),

@@ -22,9 +22,13 @@ class ProductCardWidget extends StatelessWidget {
           onTap: () => Navigator.of(context).pushNamed(
               ProductDetailsScreen.routeName,
               arguments: productInfo.id),
-          child: Image.network(
-            productInfo.imageURL,
-            fit: BoxFit.cover,
+          child: Hero(
+            tag: productInfo.id,
+            child: FadeInImage(
+              placeholder: AssetImage('assets/images/product-placeholder.png'),
+              image: NetworkImage(productInfo.imageURL),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         footer: GridTileBar(
